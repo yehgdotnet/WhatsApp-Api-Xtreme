@@ -30,6 +30,7 @@
 <li><a href="https://github.com/0xTryCatch">0xTryCatch</a></li>
 <li><a href="https://github.com/shirioko">Shirioko</a></li>
 <li><a href="https://github.com/sinjuice">sinjuice</a></li>
+<li><a href="https://github.com/mgp25">mgp25</a></li>
 </ul>
 
 <p>And everyone that contributes to it.</p>
