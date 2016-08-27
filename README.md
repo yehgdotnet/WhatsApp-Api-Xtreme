@@ -8,15 +8,14 @@
 <p><strong>Do you like this project? Support it by donating</strong></p>
 
 <ul>
-<li><a href="https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png" target="_blank"><img src="https://raw.githubusercontent.com/reek/anti-adblock-killer/gh-pages/images/paypal.png" alt="Paypal" style="max-width:100%;"></a> Paypal: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=YNVNPLE45DNG6">Donate</a></li>
-<li><a href="https://camo.githubusercontent.com/4bc31b03fc4026aa2f14e09c25c09b81e06d5e71/687474703a2f2f7777772e6d6f6e747265616c626974636f696e2e636f6d2f696d672f66617669636f6e2e69636f" target="_blank"><img src="https://camo.githubusercontent.com/4bc31b03fc4026aa2f14e09c25c09b81e06d5e71/687474703a2f2f7777772e6d6f6e747265616c626974636f696e2e636f6d2f696d672f66617669636f6e2e69636f" alt="btc" style="max-width:100%;"></a> Bitcoin: 1DCEpC9wYXeUGXS58qSsqKzyy7HLTTXNYe </li>
+<li>Paypal: <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=HB4A7UE77UB76">Donate</a></li>
 </ul>
 
 <hr>
 
 <h3><a id="user-content-installation" class="anchor" href="#installation" aria-hidden="true"><svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16"><path d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path></svg></a>Installation</h3>
 
-<div class="highlight highlight-source-shell"><pre>composer require whatsapp/chat-api</pre></div>
+<div class="highlight highlight-source-shell"><pre>composer require whatsapp/WhatsApp-Api-Xtreme</pre></div>
 
 <ul>
 <li><strong>Requires:</strong> <a href="https://github.com/allegro/php-protobuf">PHP Protobuf</a> and <a href="https://github.com/mgp25/curve25519-php">Curve25519</a> to enable end to end encryption</li>
@@ -32,8 +31,6 @@
 <li><a href="https://github.com/shirioko">Shirioko</a></li>
 <li><a href="https://github.com/sinjuice">sinjuice</a></li>
 </ul>
-
-<p>Also Ahmed Moh'd (<a href="/mgp25/Chat-API/blob/master/fb.com/ahmed.mhd">fb.com/ahmed.mhd</a>) and Ali Hubail (<a href="https://twitter.com/hubail">@hubail</a>) for making this project possible.</p>
 
 <p>And everyone that contributes to it.</p>
 
