@@ -1,17 +1,14 @@
 <?php
-
 require_once 'events/WhatsApiEventsManager.php';
 require_once 'Constants.php';
 require_once 'token.php';
 require_once 'func.php';
-
 class Registration
 {
     protected $eventManager;
     protected $phoneNumber;
     protected $identity;      //The Device Identity token. Obtained during registration with this API
-  protected $debug;
-
+    protected $debug;
     public function __construct($number, $debug = false, $customPath = false)
     {
         $this->debug = $debug;
@@ -19,7 +16,6 @@ class Registration
         $this->eventManager = new WhatsApiEventsManager();
         $this->identity = $this->buildIdentity($customPath); // directory where identity is going to be saved
     }
-
   /**
    * Check if account credentials are valid.
    *
@@ -47,12 +43,10 @@ class Registration
       if (!$phone = $this->dissectPhone()) {
           throw new Exception('The provided phone number is not valid.');
       }
-
       $countryCode = ($phone['ISO3166'] != '') ? $phone['ISO3166'] : 'US';
       $langCode = ($phone['ISO639'] != '') ? $phone['ISO639'] : 'en';
-
-    // Build the url.
-    $host = 'https://'.Constants::WHATSAPP_CHECK_HOST;
+      // Build the url.
+      $host = 'https://'.Constants::WHATSAPP_CHECK_HOST;
       $query = [
       'cc'                 => $phone['cc'],
       'in'                 => $phone['phone'],
@@ -71,10 +65,11 @@ class Registration
       //'anhash' => md5(openssl_random_pseudo_bytes(20)),
       'extexist' => '1',
       'extstate' => '1',
-    ];
-
+      ];
+      $this->debugPrint($query);
       $response = $this->getResponse($host, $query);
-
+      $this->debugPrint($response);
+      
       if ($response->status != 'ok') {
           $this->eventManager()->fire('onCredentialsBad',
             [
@@ -82,10 +77,6 @@ class Registration
                 $response->status,
                 $response->reason,
             ]);
-
-          $this->debugPrint($query);
-          $this->debugPrint($response);
-
           throw new Exception('There was a problem trying to request the code.');
       } else {
           $this->eventManager()->fire('onCredentialsGood',
@@ -102,10 +93,8 @@ class Registration
                 $response->price_expiration,
             ]);
       }
-
       return $response;
   }
-
   /**
    * Register account on WhatsApp using the provided code.
    *
@@ -132,59 +121,35 @@ class Registration
       if (!$phone = $this->dissectPhone()) {
           throw new Exception('The provided phone number is not valid.');
       }
-
       $code = str_replace('-', '', $code);
       $countryCode = ($phone['ISO3166'] != '') ? $phone['ISO3166'] : 'US';
       $langCode = ($phone['ISO639'] != '') ? $phone['ISO639'] : 'en';
-
-    // Build the url.
-    $host = 'https://'.Constants::WHATSAPP_REGISTER_HOST;
-	if($countryCode=="RU"){
-		$query = [
-		  'cc'                 => '7',
-		  'in'                 => '9'.$phone['phone'],
-		  'lg'                 => $langCode,
-		  'lc'                 => $countryCode,
-		  'id'                 => $this->identity,
-		  'mistyped'           => '6',
-		  'network_radio_type' => '1',
-		  'simnum'             => '1',
-		  's'                  => '',
-		  'copiedrc'           => '1',
-		  'hasinrc'            => '1',
-		  'rcmatch'            => '1',
-		  'pid'                => mt_rand(100, 9999),
-		  'rchash'             => hash('sha256', openssl_random_pseudo_bytes(20)),
-		  'anhash'             => md5(openssl_random_pseudo_bytes(20)),
-		  'extexist'           => '1',
-		  'extstate'           => '1',
-		  'code'               => $code,
-		];
-	}else{
-		$query = [
-		  'cc'                 => $phone['cc'],
-		  'in'                 => $phone['phone'],
-		  'lg'                 => $langCode,
-		  'lc'                 => $countryCode,
-		  'id'                 => $this->identity,
-		  'mistyped'           => '6',
-		  'network_radio_type' => '1',
-		  'simnum'             => '1',
-		  's'                  => '',
-		  'copiedrc'           => '1',
-		  'hasinrc'            => '1',
-		  'rcmatch'            => '1',
-		  'pid'                => mt_rand(100, 9999),
-		  'rchash'             => hash('sha256', openssl_random_pseudo_bytes(20)),
-		  'anhash'             => md5(openssl_random_pseudo_bytes(20)),
-		  'extexist'           => '1',
-		  'extstate'           => '1',
-		  'code'               => $code,
-		];
-	}
-
+      // Build the url.
+      $host = 'https://'.Constants::WHATSAPP_REGISTER_HOST;
+      $query = [
+      'cc'                 => $phone['cc'],
+      'in'                 => $phone['phone'],
+      'lg'                 => $langCode,
+      'lc'                 => $countryCode,
+      'id'                 => $this->identity,
+      'mistyped'           => '6',
+      'network_radio_type' => '1',
+      'simnum'             => '1',
+      's'                  => '',
+      'copiedrc'           => '1',
+      'hasinrc'            => '1',
+      'rcmatch'            => '1',
+      'pid'                => mt_rand(100, 9999),
+      'rchash'             => hash('sha256', openssl_random_pseudo_bytes(20)),
+      'anhash'             => md5(openssl_random_pseudo_bytes(20)),
+      'extexist'           => '1',
+      'extstate'           => '1',
+      'code'               => $code,
+      ];
+      $this->debugPrint($query);
       $response = $this->getResponse($host, $query);
-
+      $this->debugPrint($response);
+      
       if ($response->status != 'ok') {
           $this->eventManager()->fire('onCodeRegisterFailed',
             [
@@ -193,14 +158,9 @@ class Registration
                 $response->reason,
                 isset($response->retry_after) ? $response->retry_after : null,
             ]);
-
-          $this->debugPrint($query);
-          $this->debugPrint($response);
-
           if ($response->reason == 'old_version') {
               $this->update();
           }
-
           throw new Exception("An error occurred registering the registration code from WhatsApp. Reason: $response->reason");
       } else {
           $this->eventManager()->fire('onCodeRegister',
@@ -217,10 +177,8 @@ class Registration
                 $response->price_expiration,
             ]);
       }
-
       return $response;
   }
-
   /**
    * Request a registration code from WhatsApp.
    *
@@ -243,54 +201,46 @@ class Registration
       if (!$phone = $this->dissectPhone()) {
           throw new Exception('The provided phone number is not valid.');
       }
-
       $countryCode = ($phone['ISO3166'] != '') ? $phone['ISO3166'] : 'US';
       $langCode = ($phone['ISO639'] != '') ? $phone['ISO639'] : 'en';
-
       if ($carrier != null) {
           $mnc = $this->detectMnc(strtolower($countryCode), $carrier);
       } else {
           $mnc = $phone['mnc'];
       }
-
-    // Build the token.
-    $token = generateRequestToken($phone['country'], $phone['phone'], $platform);
-
-    // Build the url.
-    $host = 'https://'.Constants::WHATSAPP_REQUEST_HOST;
-		$query = [
-			'cc'                 => $phone['cc'],
-			'in'                 => $phone['phone'],
-			'lg'                 => $langCode,
-			'lc'                 => $countryCode,
-			'id'                 => $this->identity,
-			'token'              => $token,
-			'mistyped'           => '6',
-			'network_radio_type' => '1',
-			'simnum'             => '1',
-			's'                  => '',
-			'copiedrc'           => '1',
-			'hasinrc'            => '1',
-			'rcmatch'            => '1',
-			'pid'                => mt_rand(100, 9999),
-			'rchash'             => hash('sha256', openssl_random_pseudo_bytes(20)),
-			'anhash'             => md5(openssl_random_pseudo_bytes(20)),
-			'extexist'           => '1',
-			'extstate'           => '1',
-			'mcc'                => $phone['mcc'],
-			'mnc'                => $mnc,
-			'sim_mcc'            => $phone['mcc'],
-			'sim_mnc'            => $mnc,
-			'method'             => $method,
-			//'reason' => "self-send-jailbroken",
-		];
-
+      // Build the token.
+      $token = generateRequestToken($phone['country'], $phone['phone'], $platform);
+      // Build the url.
+      $host = 'https://'.Constants::WHATSAPP_REQUEST_HOST;
+      $query = [
+        'cc'                 => $phone['cc'],
+        'in'                 => $phone['phone'],
+        'lg'                 => $langCode,
+        'lc'                 => $countryCode,
+        'id'                 => $this->identity,
+        'token'              => $token,
+        'mistyped'           => '6',
+        'network_radio_type' => '1',
+        'simnum'             => '1',
+        's'                  => '',
+        'copiedrc'           => '1',
+        'hasinrc'            => '1',
+        'rcmatch'            => '1',
+        'pid'                => mt_rand(100, 9999),
+        'rchash'             => hash('sha256', openssl_random_pseudo_bytes(20)),
+        'anhash'             => md5(openssl_random_pseudo_bytes(20)),
+        'extexist'           => '1',
+        'extstate'           => '1',
+        'mcc'                => $phone['mcc'],
+        'mnc'                => $mnc,
+        'sim_mcc'            => $phone['mcc'],
+        'sim_mnc'            => $mnc,
+        'method'             => $method,
+        //'reason' => "self-send-jailbroken",
+      ];
       $this->debugPrint($query);
-
       $response = $this->getResponse($host, $query);
-
       $this->debugPrint($response);
-
       if ($response->status == 'ok') {
           $this->eventManager()->fire('onCodeRegister',
             [
@@ -344,10 +294,8 @@ class Registration
                 $response->length,
             ]);
       }
-
       return $response;
   }
-
   /**
    * Get a decoded JSON response from Whatsapp server.
    *
@@ -360,10 +308,8 @@ class Registration
   {
       // Build the url.
       $url = $host.'?'.http_build_query($query);
-
       // Open connection.
       $ch = curl_init();
-
       // Configure the connection.
       curl_setopt($ch, CURLOPT_URL, $url);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -372,16 +318,12 @@ class Registration
       curl_setopt($ch, CURLOPT_HTTPHEADER, ['Accept: text/json']);
       // This makes CURL accept any peer!
       curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
       // Get the response.
       $response = curl_exec($ch);
-
       // Close the connection.
       curl_close($ch);
-
       return json_decode($response);
   }
-
   /**
    * Dissect country code from phone number.
    *
@@ -401,16 +343,13 @@ class Registration
               if (strpos($this->phoneNumber, $data[1]) === 0) {
                   // Return the first appearance.
                   fclose($handle);
-
                   $mcc = explode('|', $data[2]);
                   $mcc = $mcc[0];
-
                   //hook:
                   //fix country code for North America
                   if ($data[1][0] == '1') {
                       $data[1] = '1';
                   }
-
                   $phone = [
                       'country' => $data[0],
                       'cc'      => $data[1],
@@ -420,7 +359,6 @@ class Registration
                       'ISO639'  => @$data[4],
                       'mnc'     => $data[5],
                   ];
-
                   $this->eventManager()->fire('onDissectPhone',
                       [
                           $this->phoneNumber,
@@ -433,21 +371,17 @@ class Registration
                           $phone['mnc'],
                       ]
                   );
-
                   return $phone;
               }
           }
           fclose($handle);
       }
-
       $this->eventManager()->fire('onDissectPhoneFailed',
           [
               $this->phoneNumber,
           ]);
-
       return false;
   }
-
   /**
    * Detects mnc from specified carrier.
    *
@@ -462,34 +396,27 @@ class Registration
   {
       $fp = fopen(__DIR__.DIRECTORY_SEPARATOR.'networkinfo.csv', 'r');
       $mnc = null;
-
       while ($data = fgetcsv($fp, 0, ',')) {
           if ($data[4] === $lc && $data[7] === $carrierName) {
               $mnc = $data[2];
               break;
           }
       }
-
       if ($mnc == null) {
           $mnc = '000';
       }
-
       fclose($fp);
-
       return $mnc;
   }
-
     public function update()
     {
         $WAData = json_decode(file_get_contents(Constants::WHATSAPP_VER_CHECKER), true);
         $WAver = $WAData['e'];
-
         if (Constants::WHATSAPP_VER != $WAver) {
             updateData('token.php', null, $WAData['h']);
             updateData('Constants.php', $WAver);
         }
     }
-
   /**
    * Create an identity string.
    *
@@ -504,25 +431,26 @@ class Registration
       if ($identity_file === false) {
           $identity_file = sprintf('%s%s%sid.%s.dat', __DIR__, DIRECTORY_SEPARATOR, Constants::DATA_FOLDER.DIRECTORY_SEPARATOR, $this->phoneNumber);
       }
-
+      // Check if the provided is not a file but a directory
+      if (is_dir($identity_file)) {
+          $identity_file = sprintf('%s/id.%s.dat',
+              rtrim($identity_file, "/"),
+              $this->phoneNumber
+          );
+      }
       if (is_readable($identity_file)) {
           $data = urldecode(file_get_contents($identity_file));
           $length = strlen($data);
-
           if ($length == 20 || $length == 16) {
               return $data;
           }
       }
-
       $bytes = strtolower(openssl_random_pseudo_bytes(20));
-
       if (file_put_contents($identity_file, urlencode($bytes)) === false) {
           throw new Exception('Unable to write identity file to '.$identity_file);
       }
-
       return $bytes;
   }
-
   /**
    * Print a message to the debug console.
    *
@@ -538,13 +466,10 @@ class Registration
           } else {
               echo $debugMsg;
           }
-
           return true;
       }
-
       return false;
   }
-
   /**
    * @return WhatsApiEventsManager
    */
