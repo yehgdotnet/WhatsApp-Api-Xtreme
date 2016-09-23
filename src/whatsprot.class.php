@@ -262,6 +262,8 @@ class WhatsProt
     {
         $ret = $this->messageQueue;
         $this->messageQueue = [];
+		
+		$this->logFile('info', 'Get Messages Now');
 
         return $ret;
     }
@@ -276,11 +278,18 @@ class WhatsProt
      */
     public function loginWithPassword($password)
     {
+		$this->logFile('info', 'Now is Login');
+		
         $this->password = $password;
         if (is_readable($this->challengeFilename)) {
             $challengeData = file_get_contents($this->challengeFilename);
+			
+			$this->logFile('info', 'Challenge Filename');
+			
             if ($challengeData) {
                 $this->challengeData = $challengeData;
+				
+				$this->logFile('info', 'Challenge Data');
             }
         }
         $login = new Login($this, $this->password);
@@ -340,6 +349,8 @@ class WhatsProt
     {
         $messageNode = new ProtocolNode('presence', ['type' => 'active'], null, '');
         $this->sendNode($messageNode);
+		
+		$this->logFile('info', 'Send Active Status Now');
     }
 
     public function sendSetPreKeys($new = false)
