@@ -1,5 +1,5 @@
 <?php
-
+	
 require_once 'protocol.class.php';
 require_once 'BinTreeNodeReader.php';
 require_once 'BinTreeNodeWriter.php';
@@ -1297,7 +1297,7 @@ class WhatsProt
      *
      * @return string Message ID.
      */
-    public function sendMessage($to, $plaintext, $force_plain = false)
+    public function sendMessage($to, $plaintext, $force_plain = true)
     {
         if (extension_loaded('curve25519') && extension_loaded('protobuf') && !$force_plain) {
             $to_num = ExtractNumber($to);
@@ -1319,7 +1319,7 @@ class WhatsProt
 					echo "Version 1 <br />";
                 }
 				
-                //$cipherText = $sessionCipher->encrypt($alteredText);
+                $cipherText = $sessionCipher->encrypt($alteredText);
 
                 if ($cipherText instanceof WhisperMessage) {
                     $type = 'msg';
@@ -1327,7 +1327,7 @@ class WhatsProt
                     $type = 'pkmsg';
                 }
 				
-                //$message = $cipherText->serialize();
+                $message = $cipherText->serialize();
                 $msgNode = new ProtocolNode('enc',
               [
                 'v'     => $version,
