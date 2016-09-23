@@ -56,9 +56,10 @@ class Login
 
 	  
 	  //Remove this to connection ok
-      /*if ($this->parent->getLoginStatus() === Constants::DISCONNECTED_STATUS) {
-          throw new LoginFailureException();
-      }*/
+      if ($this->parent->getLoginStatus() === Constants::DISCONNECTED_STATUS) {
+          echo "Disconnected ...<br />";
+		  //throw new LoginFailureException();
+      }
 
       $this->parent->logFile('info', '{number} successfully logged in', ['number' => $this->phoneNumber]);
       $this->parent->sendAvailableForChat();
