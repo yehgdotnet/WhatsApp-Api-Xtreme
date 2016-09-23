@@ -419,7 +419,7 @@ class WhatsProt
 
         $this->replaceKey = $replaceKey;
         $msgId = $this->nodeId['cipherKeys'] = $this->createIqId();
-
+		
         $userNode = [];
         foreach ($numbers as $number) {
             $userNode[] = new ProtocolNode('user',
@@ -437,6 +437,7 @@ class WhatsProt
             ], [$keyNode], null);
 
         $this->sendNode($node);
+		
         $this->waitForServer($msgId);
     }
 
@@ -1301,47 +1302,40 @@ class WhatsProt
         if (extension_loaded('curve25519') && extension_loaded('protobuf') && !$force_plain) {
             $to_num = ExtractNumber($to);
             if (!(strpos($to, '-') !== false)) {
+				
                 if (!$this->axolotlStore->containsSession($to_num, 1)) {
                     $this->sendGetCipherKeysFromUser($to_num);
                 }
-
+				
                 $sessionCipher = $this->getSessionCipher($to_num);
 
                 if (in_array($to_num, $this->v2Jids) && !isset($this->v1Only[$to_num])) {
                     $version = '2';
                     $alteredText = padMessage($plaintext);
+					echo "Version 2 <br />";
                 } else {
                     $version = '1';
                     $alteredText = $plaintext;
+					echo "Version 1 <br />";
                 }
-                $cipherText = $sessionCipher->encrypt($alteredText);
+				
+                //$cipherText = $sessionCipher->encrypt($alteredText);
 
                 if ($cipherText instanceof WhisperMessage) {
                     $type = 'msg';
                 } else {
                     $type = 'pkmsg';
                 }
-                $message = $cipherText->serialize();
+				
+                //$message = $cipherText->serialize();
                 $msgNode = new ProtocolNode('enc',
               [
                 'v'     => $version,
                 'type'  => $type,
               ], null, $message);
+			  
             } else {
-                /* if (in_array($to, $this->v2Jids))
-          {
-            $version = "2";
-            $plaintext = padMessage($plaintext);
-          }
-          else
-            $version = "1";
-
-          if(!$this->axolotlStore->containsSenderKey($to)){
-            $gsb = new GroupSessionBuilder($this->axolotlStore);
-            $senderKey = $gsb->process ($groupId, $keyId, $iteration, $chainKey, $signatureKey)
-          }
-          $thi*/
-          $msgNode = new ProtocolNode('body', null, null, $plaintext);
+              $msgNode = new ProtocolNode('body', null, null, $plaintext);
             }
         } else {
             $msgNode = new ProtocolNode('body', null, null, $plaintext);
@@ -1806,13 +1800,15 @@ class WhatsProt
      * @param string $id      The id of the node sent that we are awaiting acknowledgement of.
      * @param int    $timeout
      */
-    public function waitForServer($id, $timeout = 5)
+    public function waitForServer($id, $timeout = 1)
     {
         $time = time();
         $this->serverReceivedId = false;
+		
         do {
             $this->pollMessage();
         } while ($this->serverReceivedId !== $id && time() - $time < $timeout);
+
     }
 
     /**
