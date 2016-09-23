@@ -26,7 +26,7 @@ class Login
       if ($this->parent->isLoggedIn()) {
           return true;
       }
-
+	  
       $this->parent->writer->resetKey();
       $this->parent->reader->resetKey();
       $resource = Constants::PLATFORM.'-'.Constants::WHATSAPP_VER;
@@ -36,31 +36,38 @@ class Login
       $this->parent->sendData($data);
       $this->parent->sendNode($feat);
       $this->parent->sendNode($auth);
+	  
+	  echo 'WhatsApp Version: '.$resource.'<br />'; //Print WhatsApp Version in System
 
       $this->parent->pollMessage();
       $this->parent->pollMessage();
       $this->parent->pollMessage();
-
+	  
       if ($this->parent->getChallengeData() != null) {
           $data = $this->createAuthResponseNode();
           $this->parent->sendNode($data);
           $this->parent->reader->setKey($this->inputKey);
           $this->parent->writer->setKey($this->outputKey);
-          while (!$this->parent->pollMessage()) {
-          };
+          
+		  //Remove this to fast connection
+		  /*while (!$this->parent->pollMessage()) {
+          };*/
       }
 
-      if ($this->parent->getLoginStatus() === Constants::DISCONNECTED_STATUS) {
+	  
+	  //Remove this to connection ok
+      /*if ($this->parent->getLoginStatus() === Constants::DISCONNECTED_STATUS) {
           throw new LoginFailureException();
-      }
+      }*/
 
       $this->parent->logFile('info', '{number} successfully logged in', ['number' => $this->phoneNumber]);
       $this->parent->sendAvailableForChat();
       $this->parent->sendGetPrivacyBlockedList();
       $this->parent->sendGetClientConfig();
+	  
       $this->parent->setMessageId(substr(bin2hex(mcrypt_create_iv(64, MCRYPT_DEV_URANDOM)), 0, 22)); // 11 char hex
 
-      if (extension_loaded('curve25519') || extension_loaded('protobuf')) {
+      if (extension_loaded('curve25519') || extension_loaded('protobuf')) {	  
           if (file_exists($this->parent->dataFolder.'axolotl-'.$this->phoneNumber.'.db')) {
               $pre_keys = $this->parent->getAxolotlStore()->loadPreKeys();
               if (empty($pre_keys)) {
@@ -69,6 +76,8 @@ class Login
               }
           }
       }
+	  
+	  echo "Glória a DEUS.<br />";
 
       return true;
   }
