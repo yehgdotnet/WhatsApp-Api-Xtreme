@@ -37,7 +37,7 @@ class Login
       $this->parent->sendNode($feat);
       $this->parent->sendNode($auth);
 	  
-	  echo 'WhatsApp Version: '.$resource.'<br />'; //Print WhatsApp Version in System
+	  echo 'WhatsApp Version: '.$resource; //Print WhatsApp Version in System
 
       $this->parent->pollMessage();
       $this->parent->pollMessage();
@@ -57,7 +57,7 @@ class Login
 	  
 	  //Remove this to connection ok
       if ($this->parent->getLoginStatus() === Constants::DISCONNECTED_STATUS) {
-          echo "Disconnected ...<br />";
+          echo "Connected ...";
 		  //throw new LoginFailureException();
       }
 
@@ -78,7 +78,7 @@ class Login
           }
       }
 	  
-	  echo "Glória a DEUS.<br />";
+	  echo "Glória a DEUS.";
 
       return true;
   }
